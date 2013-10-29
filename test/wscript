@@ -10,6 +10,10 @@ def build(bld):
 	testing_env = bld.env.derive()
 	testing_env.append_value('DFLAGS', bld.env['DFLAGS_UNIT_TESTING'])
 	testing_env.append_value('DFLAGS', bld.env['DFLAGS_DEBUG'])
+	
+	# you can choose to not include the entire source directory; sometimes this
+	# is necessary to avoid causing multiple definitions of 'main' in certain
+	# projects.
 	sources = bld.path.find_dir('..').find_dir('src').ant_glob('**/*.d')
 	
 	# this bit depends on the linker having C++ capabilities (which most have),
