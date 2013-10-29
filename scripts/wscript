@@ -1,0 +1,11 @@
+# vim: syntax=python:
+
+def options(opt):
+	pass
+
+def configure(cnf):
+	cnf.find_program('python', var='PYTHON')
+	cnf.env['CONCAT_JSON'] = cnf.path.find_resource('concat-json.py').abspath()
+
+def build(bld):
+	pass

@@ -1,4 +1,12 @@
-d-waf-skeleton
-==============
 
-Provides a skeleton for a waf project using the D language. Includes unit testing and DDOX documentation generation support.
+Build Notes
+-----------
+
+This project uses submodules! Remember to run git submodule init and
+git submodule update when cloning the repo! The wscript in lib/, however,
+should do it automatically in the configure step.
+
+Additionally, this project's configuration depends on the location of its root
+directory. Remember to rerun `./waf configure` any time that you move this
+folder's location!
+

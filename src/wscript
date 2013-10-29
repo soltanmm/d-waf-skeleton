@@ -1,0 +1,11 @@
+# vim: syntax=python:
+
+def options(opt):
+	# opt.recurse('your folder here')
+
+def configure(cnf):
+	# cnf.recurse('your folder here')
+
+def build(bld):
+	# bld.recurse('your folder here')
+

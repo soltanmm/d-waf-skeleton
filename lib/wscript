@@ -1,0 +1,43 @@
+# vim: syntax=python:
+
+import subprocess
+from waflib.Errors import ConfigurationError
+from waflib.Logs import log,pprint
+
+def options(opt):
+	opt.load('compiler_c compiler_d')
+
+def configure(cnf):
+	cnf.load('compiler_c compiler_d')
+	
+	##############
+	# SUBMODULES #
+	##############
+	rundir = cnf.path.find_node('..').abspath()
+	pprint('BLUE', "Initializing git submodules.")
+	submodinit = subprocess.Popen(
+		['git', 'submodule', 'init'],
+		cwd=rundir
+	)
+	submodinit.wait()
+	if submodinit.returncode != 0:
+		pprint('RED', "Couldn't initialize git submodules.")
+		raise ConfigurationError("Couldn't initialize git submodules.")
+	pprint('GREEN', "Initialized git submodules.")
+	
+	pprint('BLUE', "Updating git submodules.")
+	submodupdate = subprocess.Popen(
+		['git', 'submodule', 'update'],
+		cwd=rundir
+	)
+	submodupdate.wait()
+	if submodupdate.returncode != 0:
+		pprint('RED', "Couldn't update git submodules.")
+		raise ConfigurationError("Couldn't update git submodules.")
+	pprint('GREEN', "Updated git submodules.")
+
+def build(bld):
+
+	# Place whatever library-building things you need here
+
+	pass
