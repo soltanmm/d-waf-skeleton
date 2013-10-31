@@ -69,12 +69,9 @@ def build(bld):
 			cmd = basecmd.replace('${DDOX}', task.env.DDOX).replace('${SRC}', task.inputs[0].abspath()).replace('${DOCDIR}', task.env.DOCDIR)
 			import os
 			os.chdir(bld.variant_dir)
-			successful = False
 			try:
-				successful = ( bld.cmd_and_log(cmd) == 0 )
+				bld.cmd_and_log(cmd)
 			except Exception as e:
-				successful = False
-			if not successful:
 				from waflib import Logs
 				Logs.error("Couldn't generate documentation!")
 				Logs.info("Ignoring documentation generation failure...")
