@@ -16,9 +16,8 @@ def build(bld):
     # projects.
     sources = bld.path.find_dir('..').find_dir('src').ant_glob('**/*.d')
     
-    # this bit depends on the linker having C++ capabilities (which most have),
-    # namely because there are N (identical) definitions flying around and
-    # the linker needs to scrap N-1 of them.
+    # this bit compiles each individual source file for the purpose of
+    # unit testing.
     i = 0
     for s in sources:
         kosher_s = str(s).replace('.', '_')
