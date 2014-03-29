@@ -1,84 +1,84 @@
-# vim: syntax=python:
+# vim: syntax=python:shiftwidth=4:expandtab:tabstop=4:softtabstop=4
 
 def options(opt):
-	pass
+    pass
 
 def configure(cnf):
-	srcnode = cnf.path.find_node('..').find_node('src')
-	preference_order = ['DMD','GDC','LDC']
-	includes = ' -I'+srcnode.abspath()
-	
-	def use_GDC():
-		try:
-			cnf.find_program('gdc',var='GDC')
-			cnf.env['MAKE_DOCUMENTATION_JSON_RULE'] = '${GDC} -c -fdoc '+includes+' -fXf=${TGT} ${SRC}'
-			return True
-		except:
-			return False
-	def use_LDC():
-		try:
-			cnf.find_program('ldc2',var='LDC')
-			cnf.env['MAKE_DOCUMENTATION_JSON_RULE'] = '${LDC} -c -D -o- '+includes+' -X -Xf=${TGT} ${SRC}'
-			return True
-		except:
-			return False
-	def use_DMD():
-		try:
-			cnf.find_program('dmd',var='DMD')
-			cnf.env['MAKE_DOCUMENTATION_JSON_RULE'] = '${DMD} ${SRC} -D -o- -c -X -Xf${TGT} '+includes
-			return True
-		except:
-			return False
-	for c in preference_order:
-		if eval('use_'+c+'()'):
-			cnf.env['MAKE_DOCUMENTATION'] = True
-			break
-	else:
-		cnf.env['MAKE_DOCUMENTATION'] = False
-	
-	try:
-		cnf.find_program('ddox',var='DDOX')
-		cnf.env['MAKE_DOCUMENTATION_RULE'] = '${DDOX} generate-html ${SRC} ${DOCDIR}'
-		cnf.env['SERVE_DOCUMENTATION_RULE'] = '${DDOX} serve-html ${SRC}'
-	except:
-		cnf.env['MAKE_DOCUMENTATION'] = False
-	
+    srcnode = cnf.path.find_node('..').find_node('src')
+    preference_order = ['DMD','GDC','LDC']
+    includes = ' -I'+srcnode.abspath()
+    
+    def use_GDC():
+        try:
+            cnf.find_program('gdc',var='GDC')
+            cnf.env['MAKE_DOCUMENTATION_JSON_RULE'] = '${GDC} -c -fdoc '+includes+' -fXf=${TGT} ${SRC}'
+            return True
+        except:
+            return False
+    def use_LDC():
+        try:
+            cnf.find_program('ldc2',var='LDC')
+            cnf.env['MAKE_DOCUMENTATION_JSON_RULE'] = '${LDC} -c -D -o- '+includes+' -X -Xf=${TGT} ${SRC}'
+            return True
+        except:
+            return False
+    def use_DMD():
+        try:
+            cnf.find_program('dmd',var='DMD')
+            cnf.env['MAKE_DOCUMENTATION_JSON_RULE'] = '${DMD} ${SRC} -D -o- -c -X -Xf${TGT} '+includes
+            return True
+        except:
+            return False
+    for c in preference_order:
+        if eval('use_'+c+'()'):
+            cnf.env['MAKE_DOCUMENTATION'] = True
+            break
+    else:
+        cnf.env['MAKE_DOCUMENTATION'] = False
+    
+    try:
+        cnf.find_program('ddox',var='DDOX')
+        cnf.env['MAKE_DOCUMENTATION_RULE'] = '${DDOX} generate-html ${SRC} ${DOCDIR}'
+        cnf.env['SERVE_DOCUMENTATION_RULE'] = '${DDOX} serve-html ${SRC}'
+    except:
+        cnf.env['MAKE_DOCUMENTATION'] = False
+    
 def build(bld):
-	if bld.env['MAKE_DOCUMENTATION']:
-		srcnode = bld.path.find_node('..').find_node('src')
-		srcs = srcnode.ant_glob("**/*.d")
-		jsonfiles = []
-		for src in srcs:
-			jsonfile = bld.path.find_or_declare(src.relpath()).change_ext('.json')
-			bld(
-				rule=bld.env['MAKE_DOCUMENTATION_JSON_RULE'],
-				source=src,
-				target=jsonfile
-			)
-			jsonfiles.append(jsonfile)
-		docsjson = bld.path.find_or_declare('docs.json')
-		bld(
-			rule='${PYTHON} ${CONCAT_JSON} ${SRC} -o ${TGT}',
-			source=jsonfiles,
-			target=docsjson
-		)
-		docenv = bld.env.derive()
-		docenv['DOCDIR'] = bld.path.find_or_declare('html').abspath()
-		def make_docs(task):
-			basecmd = task.env['MAKE_DOCUMENTATION_RULE']
-			cmd = basecmd.replace('${DDOX}', task.env.DDOX).replace('${SRC}', task.inputs[0].abspath()).replace('${DOCDIR}', task.env.DOCDIR)
-			import os
-			os.chdir(bld.variant_dir)
-			try:
-				bld.cmd_and_log(cmd)
-			except Exception as e:
-				from waflib import Logs
-				Logs.error("Couldn't generate documentation!")
-				Logs.info("Ignoring documentation generation failure...")
-			return 0
-		bld(
-			rule=make_docs,
-			source=docsjson,
-			env=docenv
-		)
+    if bld.env['MAKE_DOCUMENTATION']:
+        srcnode = bld.path.find_node('..').find_node('src')
+        srcs = srcnode.ant_glob("**/*.d")
+        jsonfiles = []
+        for src in srcs:
+            jsonfile = bld.path.find_or_declare(src.relpath()).change_ext('.json')
+            bld(
+                rule=bld.env['MAKE_DOCUMENTATION_JSON_RULE'],
+                source=src,
+                target=jsonfile
+            )
+            jsonfiles.append(jsonfile)
+        docsjson = bld.path.find_or_declare('docs.json')
+        bld(
+            rule='${PYTHON} ${CONCAT_JSON} ${SRC} -o ${TGT}',
+            source=jsonfiles,
+            target=docsjson
+        )
+        docenv = bld.env.derive()
+        docenv['DOCDIR'] = bld.path.find_or_declare('html').abspath()
+        def make_docs(task):
+            basecmd = task.env['MAKE_DOCUMENTATION_RULE']
+            cmd = basecmd.replace('${DDOX}', task.env.DDOX).replace('${SRC}', task.inputs[0].abspath()).replace('${DOCDIR}', task.env.DOCDIR)
+            import os
+            os.chdir(bld.variant_dir)
+            try:
+                bld.cmd_and_log(cmd)
+            except Exception as e:
+                from waflib import Logs
+                Logs.error("Couldn't generate documentation!")
+                Logs.info("Ignoring documentation generation failure...")
+            return 0
+        bld(
+            rule=make_docs,
+            source=docsjson,
+            env=docenv
+        )
 

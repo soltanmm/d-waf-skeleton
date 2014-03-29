@@ -1,11 +1,11 @@
-# vim: syntax=python:
+# vim: syntax=python:shiftwidth=4:expandtab:tabstop=4:softtabstop=4
 
 def options(opt):
-	pass
+    pass
 
 def configure(cnf):
-	cnf.find_program('python', var='PYTHON')
-	cnf.env['CONCAT_JSON'] = cnf.path.find_resource('concat-json.py').abspath()
+    cnf.find_program('python', var='PYTHON')
+    cnf.env['CONCAT_JSON'] = cnf.path.find_resource('concat-json.py').abspath()
 
 def build(bld):
-	pass
+    pass
